@@ -56,6 +56,7 @@ public sealed class MarketResearchService(IMarketDataProvider marketDataProvider
         return new ResearchViewModel
         {
             Stock = selected,
+            Stocks = feed.Stocks,
             IntradayPlan = BuildIntradayPlan(selected),
             SwingPlan = BuildSwingPlan(selected),
             Findings = BuildFindings(selected),

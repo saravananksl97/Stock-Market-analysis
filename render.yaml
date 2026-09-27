@@ -10,3 +10,5 @@ services:
         value: "10000"
       - key: MarketData__UpstoxAnalyticsToken
         sync: false
+      - key: MarketData__AlphaVantageApiKey
+        sync: false

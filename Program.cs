@@ -7,6 +7,7 @@ builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<DemoMarketDataProvider>();
 builder.Services.AddScoped<UpstoxMarketDataProvider>();
+builder.Services.AddScoped<AlphaVantageDailyMarketDataProvider>();
 builder.Services.AddScoped<IMarketDataProvider, ConfigurableMarketDataProvider>();
 builder.Services.AddScoped<IMarketResearchService, MarketResearchService>();
 

@@ -12,7 +12,7 @@ dotnet restore
 dotnet run
 ```
 
-The default provider is deterministic synthetic sample data. It is labeled in the UI and is not historical or live NSE data.
+Without a provider key, the app uses deterministic synthetic sample data. It is labeled in the UI and is not historical or live market data.
 
 ## Free Preview Deployment
 
@@ -28,6 +28,17 @@ For NSE quotes, the app supports Upstox's official read-only Analytics Token and
 $env:MarketData__UpstoxAnalyticsToken = "<set locally; do not commit>"
 dotnet run
 ```
+
+For swing research without broker onboarding, Alpha Vantage has a free daily-history API key. Its documented India example is BSE (`RELIANCE.BSE`), so this feed is explicitly labeled BSE and must not be treated as NSE or live data. The free tier allows 25 API requests per day; this integration requests four BSE symbols and caches the feed for 12 hours. The daily endpoint returns up to the latest 100 observations on the free tier, enough to warm up EMA(50), but not to run long historical backtests. Intraday bars are not provided by this integration.
+
+Get a free API key at [Alpha Vantage](https://www.alphavantage.co/support/#api-key), then configure it locally:
+
+```powershell
+$env:MarketData__AlphaVantageApiKey = "<set locally; do not commit>"
+dotnet run
+```
+
+For Render, set `MarketData__AlphaVantageApiKey` as a secret environment variable. Upstox takes precedence if both provider keys are configured. The app computes swing EMA, RSI, ATR, volume context, conditional entry/stop/target levels and the existing strategy analysis from the returned daily candles. Verify exchange, timestamps and provider coverage before relying on the output. The provider's free tier is for non-commercial use.
 
 On Render, provide `MarketData__UpstoxAnalyticsToken` as a secret environment variable during Blueprint setup or in the service settings. Do not put tokens in Razor views, browser JavaScript, `appsettings.json`, or Git. The integration uses the Upstox full-market-quotes API and V3 5-minute and daily candle endpoints. The dashboard caches provider responses for 20 seconds and reports the provider timestamp. Confirm the feed's licensing and redistribution terms for your intended use. This project does not scrape NSE website endpoints and does not submit orders.
 

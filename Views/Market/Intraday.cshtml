@@ -4,7 +4,7 @@
     ViewData["Section"] = "Intraday";
 }
 <div class="page-heading">
-    <div><div class="eyebrow">5-minute bars · NSE cash</div><h1>Intraday scanner</h1><p class="subheading">Opening Range Breakout + VWAP confirmation with explicit invalidation.</p></div>
+    <div><div class="eyebrow">5-minute bars · Cash market</div><h1>Intraday scanner</h1><p class="subheading">Opening Range Breakout + VWAP confirmation with explicit invalidation.</p></div>
     <span class="source-pill @(Model.IsDemo ? "demo" : "provider")"><i></i>@(Model.IsDemo ? "SYNTHETIC DEMO" : "PROVIDER FEED")</span>
 </div>
 <div class="filter-row"><form method="get" asp-action="Intraday" class="inline-form"><label for="symbol">Instrument</label><select id="symbol" name="symbol" onchange="this.form.submit()"><option value="">Select stock</option>@foreach (var row in Model.Candidates){<option value="@row.Stock.Symbol" selected="@(row.Stock.Symbol == Model.SelectedStock.Symbol)">@row.Stock.Symbol · @row.Stock.Company</option>}</select></form><span class="feed-caption">@Model.SelectedStock.DataSource · @Model.FeedStatus</span></div>

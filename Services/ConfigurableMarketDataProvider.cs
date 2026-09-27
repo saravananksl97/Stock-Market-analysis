@@ -8,7 +8,8 @@ public sealed class ConfigurableMarketDataProvider(
     IHttpClientFactory httpClientFactory,
     IConfiguration configuration,
     DemoMarketDataProvider demoProvider,
-    UpstoxMarketDataProvider upstoxProvider) : IMarketDataProvider
+    UpstoxMarketDataProvider upstoxProvider,
+    AlphaVantageDailyMarketDataProvider alphaVantageProvider) : IMarketDataProvider
 {
     public async Task<MarketFeed> GetFeedAsync(CancellationToken cancellationToken = default)
     {
@@ -22,6 +23,19 @@ public sealed class ConfigurableMarketDataProvider(
             catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException or JsonException)
             {
                 return demoProvider.CreateFeed("Upstox feed unavailable; displaying synthetic demo data.");
+            }
+        }
+
+        var alphaVantageApiKey = configuration["MarketData:AlphaVantageApiKey"];
+        if (!string.IsNullOrWhiteSpace(alphaVantageApiKey))
+        {
+            try
+            {
+                return await alphaVantageProvider.GetFeedAsync(alphaVantageApiKey, cancellationToken);
+            }
+            catch (Exception exception) when (exception is HttpRequestException or TaskCanceledException or JsonException)
+            {
+                return demoProvider.CreateFeed($"Alpha Vantage daily feed unavailable ({exception.Message}); displaying synthetic demo data.");
             }
         }
 

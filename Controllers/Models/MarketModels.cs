@@ -111,6 +111,7 @@ public sealed class BacktestViewModel
 public sealed class ResearchViewModel
 {
     public required StockSnapshot Stock { get; init; }
+    public required IReadOnlyList<StockSnapshot> Stocks { get; init; }
     public required TradePlan IntradayPlan { get; init; }
     public required TradePlan SwingPlan { get; init; }
     public required IReadOnlyList<ResearchFinding> Findings { get; init; }

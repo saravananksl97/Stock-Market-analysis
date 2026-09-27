@@ -4,10 +4,10 @@
     ViewData["Section"] = "Swing research";
 }
 <div class="page-heading">
-    <div><div class="eyebrow">Daily candles · 20/50 EMA</div><h1>Swing research</h1><p class="subheading">Trend, pullback, volatility and fundamental coverage for a liquid-stock watchlist.</p></div>
+    <div><div class="eyebrow">Daily end-of-day candles · 20/50 EMA</div><h1>Swing research</h1><p class="subheading">Trend, pullback, volatility and fundamental coverage for a liquid-stock watchlist.</p></div>
     <span class="source-pill @(Model.IsDemo ? "demo" : "provider")"><i></i>@(Model.IsDemo ? "SYNTHETIC DEMO" : "PROVIDER FEED")</span>
 </div>
-<div class="filter-row"><form method="get" asp-action="Swing" class="inline-form"><label for="symbol">Instrument</label><select id="symbol" name="symbol" onchange="this.form.submit()"><option value="">Select stock</option>@foreach (var row in Model.Candidates){<option value="@row.Stock.Symbol" selected="@(row.Stock.Symbol == Model.SelectedStock.Symbol)">@row.Stock.Symbol · @row.Stock.Company</option>}</select></form><span class="feed-caption">Research is only as current as the underlying feed.</span></div>
+<div class="filter-row"><form method="get" asp-action="Swing" class="inline-form"><label for="symbol">Instrument</label><select id="symbol" name="symbol" onchange="this.form.submit()"><option value="">Select stock</option>@foreach (var row in Model.Candidates){<option value="@row.Stock.Symbol" selected="@(row.Stock.Symbol == Model.SelectedStock.Symbol)">@row.Stock.Symbol · @row.Stock.Company</option>}</select></form><span class="feed-caption">@Model.FeedStatus</span></div>
 <div class="research-hero"><div><div class="eyebrow">@Model.SelectedStock.Sector · @Model.SelectedStock.DataSource</div><h2>@Model.SelectedStock.Company <span>@Model.SelectedStock.Symbol</span></h2><div class="hero-price">₹@Model.SelectedStock.Price.ToString("N2") <small class="@(Model.SelectedStock.ChangePercent >= 0 ? "positive" : "negative")">@Model.SelectedStock.ChangePercent.ToString("+0.00;-0.00")%</small></div></div><a class="button-secondary" asp-action="Research" asp-route-symbol="@Model.SelectedStock.Symbol">Full research brief</a></div>
 <div class="research-layout">
     <div class="research-findings">
