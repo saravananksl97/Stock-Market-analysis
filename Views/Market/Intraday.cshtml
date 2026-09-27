@@ -1,0 +1,28 @@
+@model IntradayViewModel
+@{
+    ViewData["Title"] = "Intraday";
+    ViewData["Section"] = "Intraday";
+}
+<div class="page-heading">
+    <div><div class="eyebrow">5-minute bars · NSE cash</div><h1>Intraday scanner</h1><p class="subheading">Opening Range Breakout + VWAP confirmation with explicit invalidation.</p></div>
+    <span class="source-pill @(Model.IsDemo ? "demo" : "provider")"><i></i>@(Model.IsDemo ? "SYNTHETIC DEMO" : "PROVIDER FEED")</span>
+</div>
+<div class="filter-row"><form method="get" asp-action="Intraday" class="inline-form"><label for="symbol">Instrument</label><select id="symbol" name="symbol" onchange="this.form.submit()"><option value="">Select stock</option>@foreach (var row in Model.Candidates){<option value="@row.Stock.Symbol" selected="@(row.Stock.Symbol == Model.SelectedStock.Symbol)">@row.Stock.Symbol · @row.Stock.Company</option>}</select></form><span class="feed-caption">@Model.SelectedStock.DataSource · @Model.FeedStatus</span></div>
+<div class="analysis-grid">
+    <div class="analysis-main">
+        <section class="panel chart-panel">
+            <div class="panel-heading"><div><div class="eyebrow">@Model.SelectedStock.Symbol · 5-minute</div><h2>Price action</h2></div><div class="chart-price">₹@Model.SelectedStock.Price.ToString("N2")<small class="@(Model.SelectedStock.ChangePercent >= 0 ? "positive" : "negative")">@Model.SelectedStock.ChangePercent.ToString("+0.00;-0.00")%</small></div></div>
+            <div class="chart-holder"><canvas id="priceChart" aria-label="Intraday candlestick chart" data-candles="@System.Text.Json.JsonSerializer.Serialize(Model.SelectedStock.IntradayCandles)"></canvas></div>
+            <div class="chart-foot"><span>Opening range: first 3 completed bars</span><span>EMA 9 · EMA 21 · session VWAP</span></div>
+        </section>
+        <section class="panel table-panel section-space"><div class="panel-heading"><div><div class="eyebrow">Current scan</div><h2>Liquid-stock universe</h2></div><span class="small-muted">@Model.Candidates.Count symbols</span></div>
+            <div class="table-scroll"><table><thead><tr><th>Symbol</th><th>Last</th><th>Change</th><th>Signal</th><th>Rules</th><th>ATR %</th><th></th></tr></thead><tbody>
+            @foreach (var row in Model.Candidates){<tr><td><strong>@row.Stock.Symbol</strong><small>@row.Stock.Sector</small></td><td>₹@row.Stock.Price.ToString("N2")</td><td class="@(row.Stock.ChangePercent >= 0 ? "positive" : "negative")">@row.Stock.ChangePercent.ToString("+0.00;-0.00")%</td><td><span class="setup-chip @(row.Plan.Triggered ? "ready" : "")">@(row.Plan.Triggered ? row.Plan.Side : "WAIT")</span></td><td>@row.Plan.RuleChecksPassed / 3</td><td>@row.AtrPercent.ToString("N2")%</td><td><a class="row-link" asp-action="Intraday" asp-route-symbol="@row.Stock.Symbol">Inspect</a></td></tr>}
+            </tbody></table></div>
+        </section>
+    </div>
+    <div class="analysis-side">
+        @await Html.PartialAsync("_TradePlan", Model.SelectedPlan)
+        <section class="panel compact-panel"><div class="eyebrow">Rule checklist</div><h2>Before any order</h2><ul class="check-list"><li>Confirm the opening range is complete.</li><li>Use a completed candle, not an intrabar guess.</li><li>Size from stop distance and a fixed rupee risk cap.</li><li>Check spread, liquidity, circuit limits and event risk.</li><li>Do not widen a stop after entry.</li></ul></section>
+    </div>
+</div>

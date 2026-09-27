@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: rupee-desk-mvc
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /
+    envVars:
+      - key: ASPNETCORE_HTTP_PORTS
+        value: "10000"
+      - key: MarketData__UpstoxAnalyticsToken
+        sync: false

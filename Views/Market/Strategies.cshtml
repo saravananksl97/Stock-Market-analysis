@@ -1,0 +1,19 @@
+@model IReadOnlyList<StrategyInfo>
+@{
+    ViewData["Title"] = "Strategies";
+    ViewData["Section"] = "Strategies";
+}
+<div class="page-heading"><div><div class="eyebrow">Rulebook</div><h1>Strategy playbook</h1><p class="subheading">Entry, exit, failure modes and appropriate context before any backtest.</p></div></div>
+<div class="strategy-list">
+@foreach (var strategy in Model)
+{
+    <article class="panel strategy-card">
+        <div class="strategy-top"><div><div class="eyebrow">@strategy.Horizon</div><h2>@strategy.Name</h2></div><span class="panel-symbol">R:R defined in plan</span></div>
+        <div class="strategy-detail-grid"><div><h3>Entry rules</h3><p>@strategy.EntryRules</p></div><div><h3>Exit rules</h3><p>@strategy.ExitRules</p></div><div><h3>Failure modes</h3><p>@strategy.FailureModes</p></div><div><h3>Best use</h3><p>@strategy.BestUse</p></div></div>
+        @if (strategy.Name.StartsWith("Opening", StringComparison.Ordinal)){<a class="text-link" asp-action="Intraday">Open intraday scanner <span>→</span></a>}
+        else if (strategy.Name.StartsWith("Daily", StringComparison.Ordinal)){<a class="text-link" asp-action="Swing">Open swing research <span>→</span></a>}
+        else{<span class="small-muted">Documented rule only · not currently implemented in the backtest engine.</span>}
+    </article>
+}
+</div>
+<div class="callout caution-callout"><strong>Rule discipline</strong><span>Backtest only on point-in-time adjusted data. Include brokerage, STT, exchange fees, GST, stamp duty, slippage, rejected orders and realistic gap fills before considering live use.</span></div>

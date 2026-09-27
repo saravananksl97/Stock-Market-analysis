@@ -1,0 +1,25 @@
+@model SwingViewModel
+@{
+    ViewData["Title"] = "Swing research";
+    ViewData["Section"] = "Swing research";
+}
+<div class="page-heading">
+    <div><div class="eyebrow">Daily candles · 20/50 EMA</div><h1>Swing research</h1><p class="subheading">Trend, pullback, volatility and fundamental coverage for a liquid-stock watchlist.</p></div>
+    <span class="source-pill @(Model.IsDemo ? "demo" : "provider")"><i></i>@(Model.IsDemo ? "SYNTHETIC DEMO" : "PROVIDER FEED")</span>
+</div>
+<div class="filter-row"><form method="get" asp-action="Swing" class="inline-form"><label for="symbol">Instrument</label><select id="symbol" name="symbol" onchange="this.form.submit()"><option value="">Select stock</option>@foreach (var row in Model.Candidates){<option value="@row.Stock.Symbol" selected="@(row.Stock.Symbol == Model.SelectedStock.Symbol)">@row.Stock.Symbol · @row.Stock.Company</option>}</select></form><span class="feed-caption">Research is only as current as the underlying feed.</span></div>
+<div class="research-hero"><div><div class="eyebrow">@Model.SelectedStock.Sector · @Model.SelectedStock.DataSource</div><h2>@Model.SelectedStock.Company <span>@Model.SelectedStock.Symbol</span></h2><div class="hero-price">₹@Model.SelectedStock.Price.ToString("N2") <small class="@(Model.SelectedStock.ChangePercent >= 0 ? "positive" : "negative")">@Model.SelectedStock.ChangePercent.ToString("+0.00;-0.00")%</small></div></div><a class="button-secondary" asp-action="Research" asp-route-symbol="@Model.SelectedStock.Symbol">Full research brief</a></div>
+<div class="research-layout">
+    <div class="research-findings">
+        <div class="section-heading"><div><h2>Evidence board</h2><p>Signals are separated from financial facts; absent fields are not estimated.</p></div></div>
+        <div class="finding-grid">
+            @foreach (var finding in Model.Findings){<article class="finding-card"><div class="finding-label">@finding.Label</div><strong class="finding-value">@finding.Value</strong><p>@finding.Interpretation</p></article>}
+        </div>
+        <section class="panel compact-panel event-panel"><div class="eyebrow">Upcoming catalysts</div><h2>Event calendar not connected</h2><p>Check results dates, corporate actions, exchange filings, index changes and sector news from a timestamped source before holding overnight.</p><span class="small-muted">No headlines are generated or represented as live research.</span></section>
+    </div>
+    <div class="analysis-side">@await Html.PartialAsync("_TradePlan", Model.SelectedPlan)<section class="panel compact-panel"><div class="eyebrow">Holding-period risk</div><h2>Overnight gaps</h2><p>A stop-market order can fill beyond its stop after a gap. Confirm position size against the rupee loss at a worse fill, not just the planned stop distance.</p></section></div>
+</div>
+<div class="section-heading section-space"><div><h2>Swing watchlist</h2><p>Ranked by rule confluence. A WAIT is a valid outcome.</p></div></div>
+<section class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>Symbol</th><th>Last</th><th>Daily setup</th><th>Rules</th><th>RSI 14</th><th>EMA 20</th><th>EMA 50</th><th>ATR %</th></tr></thead><tbody>
+@foreach (var row in Model.Candidates){<tr><td><strong><a class="plain-link" asp-action="Swing" asp-route-symbol="@row.Stock.Symbol">@row.Stock.Symbol</a></strong><small>@row.Stock.Sector</small></td><td>₹@row.Stock.Price.ToString("N2")</td><td><span class="setup-chip @(row.Plan.Triggered ? "ready" : "")">@(row.Plan.Triggered ? row.Plan.Side : "WAIT")</span></td><td>@row.Plan.RuleChecksPassed / 4</td><td>@row.Rsi.ToString("N1")</td><td>₹@row.Ema20.ToString("N2")</td><td>₹@row.Ema50.ToString("N2")</td><td>@row.AtrPercent.ToString("N2")%</td></tr>}
+</tbody></table></div></section>

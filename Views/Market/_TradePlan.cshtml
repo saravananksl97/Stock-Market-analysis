@@ -1,0 +1,31 @@
+@model TradePlan
+<section class="panel plan-panel">
+    <div class="panel-heading">
+        <div><div class="eyebrow">Rule-based plan</div><h2>@Model.Strategy</h2></div>
+        <span class="signal-badge @(Model.Triggered ? Model.Side.ToLowerInvariant() : "wait")">@(Model.Triggered ? Model.Side : "WAIT")</span>
+    </div>
+    @if (Model.Triggered && Model.Entry is not null && Model.Stop is not null && Model.Target is not null)
+    {
+        <div class="level-grid">
+            <div class="level-cell"><span>Entry · signal close</span><strong>₹@Model.Entry.Value.ToString("N2")</strong></div>
+            <div class="level-cell stop-level"><span>Initial stop</span><strong>₹@Model.Stop.Value.ToString("N2")</strong></div>
+            <div class="level-cell target-level"><span>2R target</span><strong>₹@Model.Target.Value.ToString("N2")</strong></div>
+            <div class="level-cell"><span>Qty at 1% risk*</span><strong>@(Model.QuantityForOnePercentRisk?.ToString("N0") ?? "—")</strong></div>
+        </div>
+        <div class="plan-note">@Model.Explanation</div>
+    }
+    else
+    {
+        <div class="watch-levels">
+            <div><span>Potential long trigger</span><strong>@(Model.WatchLong is null ? "—" : $"₹{Model.WatchLong.Value:N2}")</strong></div>
+            <div><span>Potential short trigger</span><strong>@(Model.WatchShort is null ? "—" : $"₹{Model.WatchShort.Value:N2}")</strong></div>
+        </div>
+        <div class="plan-note">@Model.Explanation</div>
+    }
+    <dl class="plan-details">
+        <div><dt>Rule check</dt><dd>@Model.RuleChecksPassed checks met</dd></div>
+        <div><dt>Trigger context</dt><dd>@Model.TriggerDescription</dd></div>
+        <div><dt>Invalidation</dt><dd>@Model.InvalidatedWhen</dd></div>
+    </dl>
+    <p class="micro-note">*Indicative quantity assumes ₹1,000 risk budget, before costs and gap risk. It is not a personalized allocation. Stops do not guarantee execution at the displayed price.</p>
+</section>

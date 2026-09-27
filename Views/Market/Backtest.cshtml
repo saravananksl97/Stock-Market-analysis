@@ -1,0 +1,26 @@
+@model BacktestViewModel
+@{
+    ViewData["Title"] = "Backtest";
+    ViewData["Section"] = "Backtest";
+}
+<div class="page-heading"><div><div class="eyebrow">Historical rule simulation</div><h1>Backtest</h1><p class="subheading">One-percent risk sizing, 0.10% notional round-trip cost estimate, and conservative same-bar stop priority.</p></div><span class="source-pill @(Model.IsDemo ? "demo" : "provider")"><i></i>@(Model.IsDemo ? "SYNTHETIC HISTORY" : "PROVIDER HISTORY")</span></div>
+<section class="panel backtest-form-panel"><form method="get" asp-action="Backtest" class="backtest-form">
+    <div class="form-field"><label for="symbol">Instrument</label><select id="symbol" name="symbol" value="@Model.Symbol"><option selected value="@Model.Symbol">@Model.Symbol</option><option>RELIANCE</option><option>HDFCBANK</option><option>ICICIBANK</option><option>INFY</option><option>TCS</option><option>SBIN</option><option>LT</option><option>AXISBANK</option></select></div>
+    <div class="form-field"><label for="strategy">Strategy</label><select id="strategy" name="strategy"><option value="intraday" selected="@(Model.Strategy == "intraday")">Intraday ORB + VWAP</option><option value="swing" selected="@(Model.Strategy == "swing")">Swing EMA pullback</option></select></div>
+    <div class="form-field"><label for="sessions">Lookback sessions</label><select id="sessions" name="sessions"><option value="20" selected="@(Model.Sessions == 20)">20</option><option value="60" selected="@(Model.Sessions == 60)">60</option><option value="120" selected="@(Model.Sessions == 120)">120</option></select></div>
+    <div class="form-field"><label for="capital">Starting capital (₹)</label><input id="capital" name="capital" type="number" min="10000" max="100000000" step="10000" value="@Model.StartingCapital" /></div>
+    <button class="button-primary" type="submit">Run simulation</button>
+</form></section>
+<div class="metric-grid backtest-metrics">
+    <article class="metric-card"><span>Net return</span><strong class="@(Model.NetReturnPercent >= 0 ? "positive" : "negative")">@Model.NetReturnPercent.ToString("+0.00;-0.00")%</strong><em>After modeled costs</em></article>
+    <article class="metric-card"><span>Win rate</span><strong>@Model.WinRatePercent.ToString("N1")%</strong><em>@Model.Trades.Count trades</em></article>
+    <article class="metric-card"><span>Profit factor</span><strong>@(Model.ProfitFactor >= 99.99m ? "∞" : Model.ProfitFactor.ToString("N2"))</strong><em>Gross win / gross loss</em></article>
+    <article class="metric-card"><span>Max drawdown</span><strong class="negative">−@Model.MaxDrawdownPercent.ToString("N2")%</strong><em>Peak-to-trough equity</em></article>
+</div>
+<section class="panel compact-panel backtest-summary"><div><div class="eyebrow">@Model.Symbol · @(Model.Strategy == "swing" ? "Daily EMA pullback" : "Intraday ORB + VWAP")</div><h2>₹@Model.StartingCapital.ToString("N0") <span>→</span> ₹@Model.EndingCapital.ToString("N2")</h2><p>@Model.SessionsRun of @Model.Sessions requested sessions available · @Model.Trades.Count trades · quantity is floored to whole shares at 1% equity risk per initial stop · costs estimated at @Model.EstimatedCostPercent.ToString("N2")% of notional.</p></div><span class="source-pill @(Model.IsDemo ? "demo" : "provider")"><i></i>@Model.FeedStatus</span></section>
+<div class="section-heading section-space"><div><h2>Trade log</h2><p>Session labels are sequence identifiers in synthetic mode, not actual historical dates.</p></div></div>
+<section class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>Session</th><th>Side</th><th>Entry</th><th>Exit</th><th>Net P&amp;L</th><th>Return</th><th>Exit reason</th></tr></thead><tbody>
+@if (Model.Trades.Count == 0){<tr><td colspan="7" class="empty-row">No triggered trades in this sample. Try another symbol, strategy or lookback.</td></tr>}
+@foreach (var trade in Model.Trades.Reverse().Take(40)){<tr><td>@trade.Session</td><td>@trade.Side</td><td>₹@trade.Entry.ToString("N2")</td><td>₹@trade.Exit.ToString("N2")</td><td class="@(trade.NetPnl >= 0 ? "positive" : "negative")">₹@trade.NetPnl.ToString("+N2;-N2")</td><td class="@(trade.ReturnPercent >= 0 ? "positive" : "negative")">@trade.ReturnPercent.ToString("+0.00;-0.00")%</td><td>@trade.ExitReason</td></tr>}
+</tbody></table></div></section>
+<p class="micro-note">A backtest is not predictive. Demo OHLC is generated, not historical NSE data. Provider data must be point-in-time, split/bonus adjusted and complete; this simple model does not include all Indian taxes, brokerage slabs, market impact, circuit limits, partial fills or overnight gap-through-stop losses.</p>

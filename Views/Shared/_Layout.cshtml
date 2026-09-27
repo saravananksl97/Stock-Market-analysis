@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f2f4ef" />
+    <title>@ViewData["Title"] · Rupee Desk</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <a class="brand" asp-controller="Market" asp-action="Index"><span class="brand-mark">R</span><span>rupee desk</span></a>
+            <div class="nav-label">Market workspace</div>
+            <nav class="primary-nav" aria-label="Main navigation">
+                <a class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")" asp-controller="Market" asp-action="Index"><span>▦</span>Overview</a>
+                <a class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Intraday" ? "active" : "")" asp-controller="Market" asp-action="Intraday"><span>⌁</span>Intraday</a>
+                <a class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Swing" ? "active" : "")" asp-controller="Market" asp-action="Swing"><span>↗</span>Swing research</a>
+                <a class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Research" ? "active" : "")" asp-controller="Market" asp-action="Research"><span>⌕</span>Deep research</a>
+                <a class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Strategies" ? "active" : "")" asp-controller="Market" asp-action="Strategies"><span>≡</span>Strategies</a>
+                <a class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Backtest" ? "active" : "")" asp-controller="Market" asp-action="Backtest"><span>⌗</span>Backtest</a>
+            </nav>
+            <div class="sidebar-spacer"></div>
+            <div class="sidebar-data"><span class="status-dot"></span><span>Provider-ready · demo by default</span></div>
+            <div class="sidebar-foot">NSE cash-market research<br />No order execution</div>
+        </aside>
+        <main class="main-area">
+            <header class="topbar">
+                <div class="topbar-crumb">India markets <span>/</span> <strong>@ViewData["Section"]</strong></div>
+                <div class="topbar-right"><span class="exchange-time">NSE · 09:15–15:30 IST</span><span class="user-mark">RD</span></div>
+            </header>
+            <div class="page-content">
+                @RenderBody()
+                <footer class="global-disclaimer">Research and education only. Signals are conditional rule outputs, not recommendations or assured winners. Short plans may not be executable in cash-market swing trades; verify product, borrow and derivatives rules. Confirm live quotes, corporate actions, liquidity, costs and exchange holidays before acting.</footer>
+            </div>
+        </main>
+    </div>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
